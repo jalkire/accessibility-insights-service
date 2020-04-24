@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/dist/index.js",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
             "name": "Start debugging crawler",
             "type": "node",
             "request": "launch",

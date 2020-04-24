@@ -34,7 +34,7 @@ export abstract class PageProcessorBase {
             error: JSON.stringify(error),
             requestErrors: request.errorMessages,
         };
-        await Apify.pushData(pageData);
+        console.log('Failed to Scan page : ', pageData);
     };
 }
 
@@ -52,6 +52,7 @@ export class ClassicPageProcessor extends PageProcessorBase {
             url: request.url,
             succeeded: true,
         };
-        await Apify.pushData(pageData);
+
+        console.log('Scanned page : ', pageData);
     };
 }

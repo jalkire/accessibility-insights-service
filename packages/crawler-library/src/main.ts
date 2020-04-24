@@ -22,7 +22,7 @@ export class CrawlerEngine {
     ) {}
 
     public async start(crawlerRunOptions: CrawlerRunOptions): Promise<void> {
-        const requestList = await this.apifyFactory.createRequestList(crawlerRunOptions.existingUrls);
+        // const requestList = await this.apifyFactory.createRequestList(crawlerRunOptions.existingUrls);
         const requestQueue = await this.apifyFactory.createRequestQueue(crawlerRunOptions.baseUrl);
         const pageProcessor = this.pageProcessorFactory.createPageProcessor(
             crawlerRunOptions.pageProcessor === undefined ? 'ClassicPageProcessor' : crawlerRunOptions.pageProcessor,
@@ -35,7 +35,7 @@ export class CrawlerEngine {
 
         Apify.main(async () => {
             const crawler = new Apify.PuppeteerCrawler({
-                requestList,
+                // requestList,
                 requestQueue,
                 handlePageFunction: pageProcessor.pageProcessor,
                 handleFailedRequestFunction: pageProcessor.pageErrorProcessor,
