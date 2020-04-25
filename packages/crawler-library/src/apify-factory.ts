@@ -1,7 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import * as Apify from 'apify';
+// tslint:disable-next-line: variable-name no-var-requires no-submodule-imports no-require-imports no-any
+const ApifyRequestQueueModule: any = require('apify/build/request_queue');
 import { cloneDeep, isNil } from 'lodash';
+// tslint:disable-next-line: variable-name no-unsafe-any
+const ApifyRequestQueue: typeof Apify.RequestQueue = ApifyRequestQueueModule.RequestQueue;
 
 export type Ctor<T> = {
     prototype: Object;
@@ -12,13 +16,12 @@ class CustomRequest extends Apify.Request {
     public dequeued: boolean = false;
 }
 
-export class CustomRequestQueue extends Apify.RequestQueue {
+export class CustomRequestQueue extends ApifyRequestQueue {
     public queueId: string;
     private requests: { [key: string]: CustomRequest } = {};
 
     constructor(queueId: string) {
         super(queueId);
-        this.queueId = queueId;
     }
 
     /**
