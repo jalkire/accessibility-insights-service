@@ -42,6 +42,21 @@ export class CrawlerEngine {
             });
 
             await crawler.run();
+
+            const dataset = await Apify.openDataset('scan-results');
+
+            const topResults = await dataset.getData({ format: 'json', limit: 2 });
+            console.log('top n results fetched: ', topResults);
+
+            const keyValueStore = await Apify.openKeyValueStore('scan-results-key-value-store');
+
+            let lastKey: string;
+            await keyValueStore.forEachKey((key, index, info) => {
+                lastKey = key;
+            });
+
+            const storeData = await keyValueStore.getValue(lastKey);
+            console.log('key value store data - ', storeData);
         });
     }
 }

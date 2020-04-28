@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import { Reporter, reporterFactory } from 'accessibility-insights-report';
 import * as Apify from 'apify';
+import { AxePuppeteer } from 'axe-puppeteer';
+import { isNil } from 'lodash';
 import { PageData } from './page-data';
-
 // tslint:disable: no-unsafe-any
 
 const {
@@ -39,6 +41,11 @@ export abstract class PageProcessorBase {
 }
 
 export class ClassicPageProcessor extends PageProcessorBase {
+    private urlCount: number = 0;
+    private dataset: Promise<Apify.Dataset>;
+    private keyValueStore: Promise<Apify.KeyValueStore>;
+    private readonly reporter = reporterFactory();
+
     public pageProcessor: Apify.PuppeteerHandlePage = async ({ page, request }) => {
         const enqueued = await enqueueLinks({
             page,
@@ -47,12 +54,47 @@ export class ClassicPageProcessor extends PageProcessorBase {
         });
         console.log(`Discovered ${enqueued.length} URLs on page ${request.url}.`);
 
+        const axePuppeteer: AxePuppeteer = new AxePuppeteer(page);
+        const axeResults = await axePuppeteer.analyze();
+
         const pageData: PageData = {
             title: await page.title(),
             url: request.url,
             succeeded: true,
+            axeResults,
         };
+        this.urlCount += 1;
 
-        console.log('Scanned page : ', pageData);
+        const ds = await this.getDataSet();
+        await ds.pushData(pageData);
+
+        const kv = await this.getKeyValueStore();
+        const report = this.reporter.fromAxeResult({
+            results: axeResults,
+            serviceName: 'Accessibility Insights CLI',
+            description: `Automated report for accessibility scan of url ${request.url}`,
+            scanContext: {
+                pageTitle: pageData.title,
+            },
+        });
+
+        await kv.setValue(`id-${this.urlCount}`, report.asHTML(), { contentType: 'text/html' });
+        console.log(`Scanned page ${this.urlCount}: `, request.url);
     };
+
+    private async getDataSet(): Promise<Apify.Dataset> {
+        if (isNil(this.dataset)) {
+            this.dataset = Apify.openDataset('scan-results');
+        }
+
+        return this.dataset;
+    }
+
+    private async getKeyValueStore(): Promise<Apify.KeyValueStore> {
+        if (isNil(this.keyValueStore)) {
+            this.keyValueStore = Apify.openKeyValueStore('scan-results-key-value-store');
+        }
+
+        return this.keyValueStore;
+    }
 }

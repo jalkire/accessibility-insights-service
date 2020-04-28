@@ -1,12 +1,11 @@
 {
     "extends": "../../tsconfig.base.json",
-    "types": ["reflect-metadata"],
+    "lib": ["es6", "dom"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "esModuleInterop": true,
     "compilerOptions": {
-        "target": "es2018",
-        "lib": ["es2018", "es2018.asynciterable", "dom", "dom.iterable"],
-        "outDir": "dist"
+        "outDir": "dist",
+        "declaration": false,
+        "baseUrl": "."
     }
 }
