@@ -86,7 +86,8 @@ export class HCCrawlerOptionsFactory {
     }
 
     private isDebug(): boolean {
-        return this.currentProcess.execArgv.filter(arg => arg.toLocaleLowerCase() === '--debug').length > 0;
+        return true;
+        //return this.currentProcess.execArgv.filter(arg => arg.toLocaleLowerCase() === '--debug').length > 0;
     }
 
     private isAllowedUrl(url: string, websiteUrl: string): boolean {
